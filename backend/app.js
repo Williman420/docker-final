@@ -5,7 +5,7 @@ const mysql = require("mysql2");
 const app = express();
 app.use(express.json());
 const connection = mysql.createPool({
-  host: process.env.APP_HOST ,
+  host: process.env.APP_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -14,12 +14,12 @@ const initDatabase = () => {
   connection.query("SELECT 1", (err) => {
     if (err) {
       console.log("Database belum ready, retry 3 detik lagi...", err.message);
-      setTimeout(initDatabase, process.env.APP_PORT);
+      setTimeout(initDatabase, 3000);
       return;
     }
     console.log("Database connected");
     connection.query(
-      `CREATE TABLE IF NOT EXISTS users (   id INT AUTO_INCREMENT PRIMARY KEY,   name VARCHAR(100) NOT NULL  )`,
+      `CREATE TABLE IF NOT EXISTS users ( id INT AUTO_INCREMENT PRIMARY KEY,   name VARCHAR(100) NOT NULL  )`,
     );
   });
 };
@@ -35,7 +35,8 @@ app.get("/users", (req, res) => {
     res.json(results);
   });
 });
-app.post("/users", (req, res) => {
+
+app.post("/post", (req, res) => {
   const { name } = req.body;
   connection.query(
     "INSERT INTO users (name) VALUES (?)",
@@ -48,6 +49,31 @@ app.post("/users", (req, res) => {
     },
   );
 });
+
+app.put("/update", (req, res) => {
+  const { id, name } = req.body;
+  connection.query(
+    "UPDATE users SET name = ? WHERE id = ?",
+    [name, id],
+    (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ message: "User updated successfully" });
+    },
+  );
+});
+
+app.delete("/users/:id", (req, res) => {
+  const { id } = req.params;
+  connection.query("DELETE FROM users WHERE id = ?", [id], (err) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ message: "User deleted successfully" });
+  });
+});
+
 app.listen(process.env.APP_PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${process.env.APP_PORT}`);
 });

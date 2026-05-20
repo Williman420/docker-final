@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: ./backend/Dockerfile
-    container_name: backend-app
-    image : backend-good
+    container_name: crud-app
+    image : backend-crud
     ports:
       - "${APP_PORT}:3000"
     environment:
