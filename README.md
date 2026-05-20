@@ -128,6 +128,7 @@ Tuliskan kesimpulan singkat atau kendala yang Anda hadapi beserta solusinya sela
 
 
 
+
 ```bash
 # Contoh perintah terminal yang dijalankan
 docker build -t app-good .
